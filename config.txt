@@ -1,16 +1,20 @@
 # Maze size variables
-WIDTH=3
-HEIGHT=3
+WIDTH=20
+HEIGHT=20
 
 # Start and End coordinates
 ENTRY=0,0
-EXIT=2,2
+EXIT=4,4
 
 # Output file name
 OUTPUT_FILE=maze.txt
 
+# If PERFECT is true, there must only be one valid start->end path
+PERFECT=True
+
 # Seed for maze generation
 SEED=0
 
-# If PERFECT is true, there must only be one valid start->end path
-PERFECT=True
+# Maze display colors
+WALLS=WHITE
+OBJECTIVES=RED

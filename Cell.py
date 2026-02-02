@@ -4,9 +4,9 @@ class Cell():
         self.__y = 0
         self.__height = 0
         self.__width = 0
-        self.__color = 0
         self.__wall_bits = 0b1111
         self.__visited = False
+        self.__full = False
 
         self.x = x
         self.y = y
@@ -37,6 +37,10 @@ class Cell():
     def visited(self) -> bool:
         return self.__visited
 
+    @property
+    def full(self) -> bool:
+        return self.__full
+
     @x.setter
     def x(self, x: int) -> None:
         if x >= 0:
@@ -50,6 +54,10 @@ class Cell():
             self.__y = y
         else:
             raise ValueError(f"Error: Value (y:{y}) outside of grid")
+
+    @full.setter
+    def full(self, value: bool) -> None:
+        self.__full = value
 
     @height.setter
     def height(self, height: int) -> None:
@@ -71,13 +79,17 @@ class Cell():
         self.__visited = is_visited
 
     def get_value(self) -> int:
+        """ Returns a binary value which indicates which walls are
+            present around the cell """
         return int(self.__wall_bits)
 
     def get_hex_value(self):
+        """ Returns a formatted version of the cell's wall value """
         return f"{hex(self.__wall_bits).removeprefix('0x').upper()}"
 
     def remove_wall(self, direction: str) -> None:
-        """ Removes the cell's wall in the given direction """
+        """ Removes the cell's wall in the given direction by modifying
+            its wall value """
         binary_value = self.__wall_bits
         direction = direction.lower().title()
         match direction:
@@ -96,6 +108,7 @@ class Cell():
         self.__wall_bits = binary_value
 
     def get_walls(self) -> list:
+        """ Returns a list of every existing wall around the cell """
         walls = []
         walls_value = 0b0000
         walls_value += self.get_value()
@@ -108,3 +121,4 @@ class Cell():
         if (walls_value >> 3) & 1:
             walls.append("West")
         return walls
+    
