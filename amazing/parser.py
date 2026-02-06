@@ -44,7 +44,7 @@ def process_key_value_pair(key: str, raw_value: str
 def process_config(raw_config: Dict[str, str]
                    ) -> Dict[str, Union[int, bool, str, Tuple[int, ...]]]:
     """ Processes each key's value and converts it to the relevant type\n
-        ex: {'Exit': '19,14'} -> {'Exit': (19, 14)} """
+        ex: 'Exit': '19,14' -> 'Exit': (19, 14) """
     config: Dict[str, Union[int, bool, str, Tuple[int, ...]]] = {}
     for key, value in raw_config.items():
         config[key] = process_key_value_pair(key, value)
@@ -52,8 +52,9 @@ def process_config(raw_config: Dict[str, str]
 
 
 def is_valid_config(config: Dict) -> None:
-    """ Checks that the config data contains all the mandatory keys,
-        and that their values are correct """
+    """ Checks that the config data contains all the mandatory keys, and that
+        their values are correct. Raises a ValueError if any errors are
+        detected """
     mandatory_keys = {"WIDTH", "HEIGHT", "ENTRY",
                       "EXIT", "OUTPUT_FILE", "PERFECT",
                       "SEED", "WALLS", "OBJECTIVES", "PATH"}
@@ -114,7 +115,7 @@ def is_valid_config(config: Dict) -> None:
     if not isinstance(config["OBJECTIVES"], str):
         raise ValueError("Error parsing config file - Invalid 'OBJECTIVES' "
                          "key value\nValid colors: WHITE, RED, GREEN, "
-                         "BLUE, YELLOW")
+                         "BLUE, YELLOW, PURPLE")
     # Checks that the Path value is a string
     if not isinstance(config["PATH"], str):
         raise ValueError("Error parsing config file - Invalid 'PATH' "
@@ -125,7 +126,7 @@ def is_valid_config(config: Dict) -> None:
                                        "BLUE", "YELLOW", "PURPLE"}:
         raise ValueError("Error parsing config file - Invalid 'WALLS' "
                          "key value\nValid colors: WHITE, RED, GREEN, "
-                         "BLUE, YELLOW")
+                         "BLUE, YELLOW, PURPLE")
     # Checks that the Objectives value is a valid color
     if config["OBJECTIVES"].upper() not in {"WHITE", "RED", "GREEN",
                                             "BLUE", "YELLOW", "PURPLE"}:

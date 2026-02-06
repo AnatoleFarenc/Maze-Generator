@@ -1,8 +1,10 @@
-from .maze import Maze
-from .pathfinder import Pathfinder
+from .Maze import Maze
+from .Pathfinder import Pathfinder
 
 
 def write_maze_to_file(config: dict, maze: Maze) -> None:
+    """ Creates a file containing the maze data at the location designated
+        in the config file by the OUTPUT_FILE key """
     output_file = config["OUTPUT_FILE"]
     start = config["ENTRY"]
     end = config["EXIT"]

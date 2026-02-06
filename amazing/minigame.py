@@ -3,8 +3,8 @@ import tty
 import termios
 from time import sleep
 from os import system as console
-from .maze import Maze
-from .generator import create_new_maze
+from .Maze import Maze
+from .Generator import create_new_maze
 from .showcase import format_maze, display_maze
 
 

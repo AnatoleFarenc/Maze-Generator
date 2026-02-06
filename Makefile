@@ -29,16 +29,17 @@ RESET = \033[0m
 FLAGS = --warn-return-any --warn-unused-ignores --ignore-missing-imports \
 		--disallow-untyped-defs --check-untyped-defs --no-error-summary
 
+
 install:
 	@echo "$(BOLD)Initializing project environment:$(RESET)"
 
 	@echo "$(YELLOW)Creating virtual environment...$(RESET)"
 	@python3 -m venv $(VENV) > /dev/null 2>&1
-	@echo "$(GREEN)Virtual environment setup complete.$(RESET)"
+	@echo "$(GREEN)Virtual environment setup complete$(RESET)"
 
 	@echo "\n$(YELLOW)Installing dependencies...$(RESET)"
 	@$(PIP) install -r $(REQUIREMENTS) > /dev/null 2>&1
-	@echo "$(GREEN)All dependencies successfully installed.$(RESET)"
+	@echo "$(GREEN)All dependencies successfully installed$(RESET)"
 
 	@echo "\n$(SUCCESS)Project can now be run safely!$(RESET)"
 
@@ -59,7 +60,7 @@ lint:
 	@echo "\n$(SUCCESS)Success: no errors found in source code!$(RESET)"
 
 debug:
-	python3 -m pdb -m $(EXE) $(CONFIG)
+	@$(PYTHON) -m pdb -m $(EXE) $(CONFIG)
 
 clean:
 	@echo "$(YELLOW)Commencing cleanup operation...$(RESET)"

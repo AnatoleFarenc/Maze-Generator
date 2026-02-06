@@ -26,7 +26,7 @@ the command "make install". This will set up a virtual environment will all the 
 installed.
 
 Now that the venv is set up, you can run "make lint" to verify the source code. More specifically,
-this target will run two linters: flake8, and Mypy. Flake8 makes sure the code is formatted
+this target will run two linters: Flake8, and Mypy. Flake8 makes sure the code is formatted
 properly and has proper syntax, while Mypy is a type checker that verifies the type hints are
 consistent.
 
@@ -40,31 +40,36 @@ Finally, you can run "make clean" to delete the virtual machine, the caches, and
 
 
 # Project Overview
+
 ## Project File Organization
 Below is a representation of the file structure, aswell as a brief rundown what each folder
 contains:
+
 ```
 A-Maze-ing
 |
-├── data
+├── amazing                 # Source code
+│   ├── __init__.py
+│   └── ...
+├── data                    
 │   ├── config.txt
 │   ├── maze.txt            # Created maze data will be stored here
 │   └── requirements.txt
-├── amazing
-│   ├── __init__.py         # Marks the src directory as a package
-│   └── ...
 ├── .flake8                 # Marks the venv folder to be excluded by flake8
-├── .gitignore              # Marks files to be ignored by git
+├── .gitignore
 ├── Makefile
 └── README.md
 ```
+
 - The data/ folder holds the config and requirements files. The maze.txt file containing the created
 maze information will also be created here.
 - The amazing/ folder contains all of the source code.
 - Everything else is in the root folder.
 
+
 ## Maze Configuration
 The following is an example of a valid config file for our project:
+
 ```
 # Maze size variables
 WIDTH=10
@@ -159,7 +164,7 @@ Some actual examples of this include:
 
 Luckily, because we wrote the code to be easily maintainable and re-usable, this was not too big a
 problem, but on a larger project with more people involved it just wouldn't have cut it. It was
-a good learning experience, and we now know how to do better for future projects.
+a good learning experience, and we now know how to improve for future projects.
 
 Summarized timeline:
 1.  Parser
@@ -203,9 +208,11 @@ Below is a list of as many websites, articles, videos, or blogs we found during 
 
 [Seeded random explanation](https://www.w3schools.com/python/ref_random_seed.asp)
 
-[Markdown file structure example](https://stackoverflow.com/questions/19699059/print-directory-file-structure-with-icons-for-representation-in-markdown)
+[Creating a python package](https://packaging.python.org/en/latest/tutorials/packaging-projects/)
 
 [Readme tutorial](https://www.makeareadme.com/)
+
+[Markdown file structure example](https://stackoverflow.com/questions/19699059/print-directory-file-structure-with-icons-for-representation-in-markdown)
 
 
 ## AI

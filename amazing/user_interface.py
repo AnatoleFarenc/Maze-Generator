@@ -2,7 +2,7 @@ from copy import deepcopy
 from os import system as console
 from .minigame import game_loop
 from .parser import display_config
-from .generator import create_new_maze
+from .Generator import create_new_maze
 from .config_handler import config_menu
 from .file_handler import show_maze_data
 from .showcase import format_maze, display_maze, display_path

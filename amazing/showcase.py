@@ -2,9 +2,9 @@ from time import sleep
 from copy import deepcopy
 from typing import Optional
 from os import system as console
-from .cell import Cell
-from .maze import Maze
-from .pathfinder import Pathfinder
+from .Cell import Cell
+from .Maze import Maze
+from .Pathfinder import Pathfinder
 
 
 def is_horizontal(c: str) -> bool:
@@ -285,8 +285,8 @@ def display_path(maze: Maze, style: str, colors: tuple[str, str, str]
             case "W":
                 explorer = (x - 1, y)
             case _:
-                raise ValueError("Error displaying path - Something has gone "
-                                 "horribly wrong. RIP")
+                raise ValueError("Error displaying path - Received invalid "
+                                 "direction")
 
         if explorer != pathfinder.start.coordinates:
             add_crumb(display, camp, explorer)
@@ -294,27 +294,6 @@ def display_path(maze: Maze, style: str, colors: tuple[str, str, str]
         sleep(0.075)
 
     return display
-
-
-def debug() -> None:
-    from .maze import Maze
-    from .generator import MazeGenerator
-
-    maze = Maze(10, 10, (0, 0), (9, 9))
-    maze_gen = MazeGenerator(maze, 0)
-    maze_gen.generate()
-    grid = format_maze(maze, None, "BLOCK")
-    for row in maze:
-        for cell in row:
-            if is_full(cell):
-                add_background(grid, cell, "BLOCK")
-
-    display_maze(grid, "BLOCK", ("WHITE", "RED", "BLUE"))
-    print(is_full(maze[4][2]))
-
-
-if __name__ == "__main__":
-    debug()
 
 # Mini maze example:
 # +----+----+----+
