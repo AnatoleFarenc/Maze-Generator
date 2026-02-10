@@ -12,8 +12,10 @@ While we were given a good amount of freedom, the project must still meet some c
 - Provide a visual representation of the maze
 - Organise everything into a re-usable module
 
-On top of the mandatory part, we also implemented a few bonus features, which I will not explain
-yet in order to create a feeling of suspense.
+In addition to the mandatory part, we also implemented a few bonus features, which I will not
+explain yet in order to create a feeling of suspense.
+
+![Maze Demonstration](./images/maze.gif)
 
 
 
@@ -21,21 +23,70 @@ yet in order to create a feeling of suspense.
 In this section we will be explaining how to run our program. The instructions on how to use it
 for your own project will be in the **Re-usability** section below.
 
+### Make Install
 The first step is to make sure you are in the root folder of the project. Once there, you can run
 the command "make install". This will set up a virtual environment will all the dependencies
 installed.
 
+```console
+ $ make install
+Initializing project environment:
+Creating virtual environment...
+Virtual environment setup complete
+
+Installing dependencies...
+All dependencies successfully installed
+
+Project can now be run safely!
+```
+
+If an error occurs, it is likely because you ran out of space on your machine, or because your
+computer does not have the correct version of python installed (42 students know).
+
+### Make Lint
 Now that the venv is set up, you can run "make lint" to verify the source code. More specifically,
 this target will run two linters: Flake8, and Mypy. Flake8 makes sure the code is formatted
 properly and has proper syntax, while Mypy is a type checker that verifies the type hints are
 consistent.
 
+```console
+ $ make lint
+Verifying project source code:
+Running flake8...
+No norm errors found
+
+Running mypy...
+No typing errors found
+
+Success: no errors found in source code!
+```
+
+Hopefully no errors occur here as that would mean there are errors in the final version of our
+work...
+
+
+### Make Run
 Once that's done, we can get onto the fun part: running the program! To do this, simply run the
 command "make run" and follow the instructions within the program. You'll be able to use it to
 create new mazes, show the shortest path from start to end, change the maze colors, as well as a
 few surprise features :)
 
+```console
+ $ make run
+```
+
+### Make Clean
 Finally, you can run "make clean" to delete the virtual machine, the caches, and the maze.txt file.
+
+```console
+ % make clean
+Initiating cleanup operation...
+ - Removed directory 'amazing/__pycache__'
+ - Removed directory 'venv'
+ - Removed directory '.mypy_cache'
+
+Cleanup complete!
+```
 
 
 
@@ -45,7 +96,7 @@ Finally, you can run "make clean" to delete the virtual machine, the caches, and
 Below is a representation of the file structure, aswell as a brief rundown what each folder
 contains:
 
-```
+```bash
 A-Maze-ing
 │
 ├── amazing                 # Source code
@@ -62,7 +113,7 @@ A-Maze-ing
 ├── .gitignore
 ├── Makefile
 ├── mazegen*.whl            # Installable package
-└── README.md               # It's me!
+└── README.md               # It's me! 👋
 ```
 
 #### Notes
@@ -78,20 +129,24 @@ A-Maze-ing
 ## Maze Configuration
 The following is an example of a valid config file for our project:
 
-```
+```bash
+# Maze configuration data
+
+
 # Maze size variables
-WIDTH=10
-HEIGHT=10
+WIDTH=5
+HEIGHT=5
 
 # Start and End coordinates
 ENTRY=0,0
-EXIT=9,9
+EXIT=4,4
 
 # Output file name
-OUTPUT_FILE=maze.txt
+OUTPUT_FILE=data/maze.txt
 
-# If PERFECT is true, there must only be one possible path between two given cells
-PERFECT=True
+
+# If PERFECT is true, there must only be one valid start->end path
+PERFECT=False
 
 # Seed for maze generation
 SEED=0
@@ -100,21 +155,23 @@ SEED=0
 WALLS=WHITE
 OBJECTIVES=RED
 PATH=BLUE
+
 ```
 
 All of these keys are mandatory. If any of them are missing, or have incorrect values, the program
 will not run.
 
 Possible values for each key:
-- WIDTH & HEIGHT: Any integer. Note that if the maze is too large, the maze generation function may
-                  hit the recursion limit. However, this case is managed by Exception handling and
-                  will not result in a crash
-- ENTRY & EXIT: An x and y coordinate, separated by a comma. The coordinates must be within the
-                WIDTH and HEIGHT values
-- OUTPUT_FILE: A file name ending in ".txt"
-- PERFECT: A boolean (True or False)
-- SEED: Any integer. If the seed is 0, the program will ignore it and generate a random maze
-- WALLS, OBJECTIVES & PATH: Any color as long as it's White, Red, Green, Blue, Yellow, or Purple
+- **WIDTH & HEIGHT**: Any integer larger than 1 . Note that if the maze is too large, the maze
+                  generation function may hit the recursion limit. However, this case is managed
+                  by Exception handling and will not result in a crash
+- **ENTRY & EXIT**: An x and y coordinate, separated by a comma. The coordinates must be within the
+                    WIDTH and HEIGHT values
+- **OUTPUT_FILE**: A file name ending in ".txt"
+- **PERFECT**: A boolean (True or False)
+- **SEED**: Any integer. If the seed is 0, the program will ignore it and generate a random maze
+- **WALLS, OBJECTIVES & PATH**: Any color as long as it's White, Red, Green, Blue, Yellow, or
+                                Purple
 
 
 ## Re-usability
@@ -126,10 +183,32 @@ This will generate the package/dist folder containing the .whl file, as well as 
 Once you have obtained the .whl file, you can install it using
 "**pip install mazegen-1.0.0-py3-none-any.whl**" and import it in your project!
 
+```bash
+# from within a virtual environment
+pip install mazegen-1.0.0-py3-none-any.whl
+```
+
+### Manual
+There is also a manual that can be displayed either on the command line using
+**p3 -m pydoc mazegen**, or by using the help() function inside your program: 
+
+```bash
+# command line
+p3 -m pydoc mazegen
+```
+
+```py
+# python script
+import mazegen
+
+
+help(mazegen)
+```
+
 
 ## Maze Generation Algorithm
 For the maze, we start from a two-dimensional grid of cells.
-For the generation, we chose to use the Depth-First Search (DFS) algorithm.
+For the generation, we chose to use the **Depth-First Search** (**DFS**) algorithm.
 
 We chose this algorithm because it is simple and efficient, and works well with the project
 requirements. The principle is to explore each cell by randomly choosing one of its neighboring
@@ -163,10 +242,11 @@ total cost and repeats this process until the destination is reached.
 
 ## Bonus Features
 And now, the moment you've all been waiting for: the bonus features!
-- An improved user-interface loop that allows for dynamic config changes and viewing maze data
-  and configuration from within the program
+- The ability to modify the maze configuration within the user interface
 - Multiple display options for the generated maze
 - Pathfinding animation that shows the path being created
+- Random seed generation if no seed is provided. Users can display this seed, as well as the maze's
+  data, in the user interface
 - A fun minigame :D
 
 
@@ -185,8 +265,8 @@ Behold, a good old table to demonstrate task distribution:
 | Cell class implementation    | Parser for the config file   | Bug fixes                    |
 | Maze class implementation    | User interface loop          | Code refactoring             |
 | Maze generation algorithm    | Display functions            | README additions             |
-| Pathfinding algorithm        | Bonus features               | Re-usable packaging          |
-|                              | Makefile                     |                              |
+| Pathfinding algorithm        | Bonus features (4/5)         | Re-usable packaging          |
+| Bonus features (1/5)         | Makefile                     |                              |
 
 
 ### Roadmap
@@ -230,7 +310,10 @@ While putting together the pieces of this project, we were both surprised at how
 There were no issues implementing one person's code into the other's, and we were both able to
 accomplish our share of the work. Communication played an important role in this: we made sure to
 consult the other person on how best to accomplish each task, and reached a consensus before doing
-anything. This also meant that we were both happy with the final result and know how the entire
+anything. Since our schedules weren't always in-sync, we also made sure to summarize what we 
+worked on so that the other person would not be lost in the new version.
+
+This meant that we were both happy with the final result and know how the entire
 thing works and fits together, even if we each handled our respective parts separately. We also
 made sure the code was easily re-usable, which made complex features more easy to implement, as
 we could build on top of an already solid foundation.
@@ -270,9 +353,13 @@ Below is a list of as many websites, articles, videos, or blogs we found during 
 
 
 ## AI
-While we wanted to avoid using it as much as possible for pride-related reasons, AI was still used
-sparingly for a few cases, in order to avoid spending too much time on the boring parts:
+While AI was used in order to avoid spending too much time on the boring parts, we wanted to avoid
+relying on it: partly for pride-related reasons, but above all because you get more out of figuring
+things out yourself.
+
+Examples of things we used AI for include:
 - Debugging
+- Algorithm explanations
 - Researching specific information:
   - Relevant UNICODE symbols
   - Useful libraries

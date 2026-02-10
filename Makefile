@@ -18,7 +18,7 @@ MODULE = mazegen
 DIST = $(PACKAGE)/dist
 WHEEL = *.whl
 
-TRASH = $(SRC)/__pycache__ $(VENV) .mypy_cache __pycache__ $(PACKAGE)/dist $(PACKAGE)/*.egg-info $(OUTPUT)
+TRASH = $(SRC)/__pycache__ $(VENV) .mypy_cache __pycache__ $(PACKAGE)/*.egg-info $(OUTPUT)
 
 
 # ANSI codes

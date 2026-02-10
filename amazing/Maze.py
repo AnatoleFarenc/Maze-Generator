@@ -31,6 +31,8 @@ class Maze():
         x, y = start
         if x >= 0 and x < self.width and y >= 0 and y < self.height:
             self.__start = start
+        else:
+            raise ValueError(f"Error: maze start out of range ({start})")
 
     @property
     def end(self) -> tuple[int, int]:
@@ -43,6 +45,8 @@ class Maze():
         if end[0] >= 0 and end[0] < self.width:
             if end[1] >= 0 and end[1] < self.height:
                 self.__end = end
+                return
+        raise ValueError(f"Error: maze end out of range ({end})")
 
     @property
     def height(self) -> int:
@@ -54,6 +58,8 @@ class Maze():
         """ Set height of maze """
         if height > 0:
             self.__height = height
+        else:
+            raise ValueError(f"Error: height to small: ({height})")
 
     @property
     def width(self) -> int:
@@ -65,6 +71,8 @@ class Maze():
         """ Set width of maze """
         if width > 0:
             self.__width = width
+        else:
+            raise ValueError(f"Error: witdth to small: ({width})")
 
     @property
     def seed(self) -> int:
@@ -72,10 +80,12 @@ class Maze():
 
     @seed.setter
     def seed(self, seed: int) -> None:
+        if not isinstance(seed, int):
+            raise ValueError(f"Error: Invalid seed: ({seed})")
         self.__seed = seed
 
     def __getitem__(self, index: int) -> list[Cell]:
-        """ Return line cell of maze grid """
+        """ Return cell of maze grid """
         if not (0 <= index < self.height):
             raise IndexError(f"Error: index {index} out of range "
                              f"({self.width}, {self.height})")
@@ -95,9 +105,9 @@ class Maze():
 
         return output_data
 
-    def get_cell(self, cordinate: Tuple[int, int]) -> Cell:
+    def get_cell(self, coordinate: Tuple[int, int]) -> Cell:
         """ Return Cell in grid maze """
-        x, y = cordinate
+        x, y = coordinate
         if x < 0 and x > self.width:
             raise ValueError(f"Error finding cell - x coordinate {x} is "
                              "outside of the maze dimensions")
@@ -105,7 +115,7 @@ class Maze():
             raise ValueError(f"Error finding cell - y coordinate {y} is "
                              "outside of the maze dimensions")
 
-        return self.grid[y][x]
+        return self[y][x]
 
     def add_connection(self, cell_1: tuple, cell_2: tuple) -> None:
         """ Adds a connection between two cells in the maze by removing the

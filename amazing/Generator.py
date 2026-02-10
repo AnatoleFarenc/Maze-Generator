@@ -61,9 +61,9 @@ class MazeGenerator():
         """ Return random value with generator """
         return self.__rng
 
-    def check_cordinate_in_range(self, cordinate: tuple[int, int]) -> bool:
+    def check_coordinate_in_range(self, coordinate: tuple[int, int]) -> bool:
         """ Return if the coordianate isn't out the range of maze grid """
-        x, y = cordinate
+        x, y = coordinate
         if x < 0 or x >= self.maze.width:
             return False
         if y < 0 or y >= self.maze.height:
@@ -89,7 +89,7 @@ class MazeGenerator():
                      "left": (current.x - 1, current.y)}
 
         for _, value in neighbour.items():
-            if self.check_cordinate_in_range(value):
+            if self.check_coordinate_in_range(value):
                 if not self.maze[value[1]][value[0]].visited:
                     neighbours.append(self.maze[value[1]][value[0]])
         if len(neighbours) > 0:
@@ -110,23 +110,21 @@ class MazeGenerator():
 
     def can_break_wall(self, current: Cell, neighbor: Cell) -> bool:
         """ Checks if the wall between current and neighbor can be broken """
-        def is_valid(cordinate: tuple) -> bool:
-            c_x, c_y = cordinate
-            if not self.check_cordinate_in_range((c_x, c_y)):
+        def is_valid(coordinate: tuple) -> bool:
+            c_x, c_y = coordinate
+            if not self.check_coordinate_in_range((c_x, c_y)):
                 return False
             cell = self.maze.get_cell((c_x, c_y))
             return cell == current or cell == neighbor or not cell.full
 
         x, y = current.coordinates
-        offsets = [
-                    (x - 1, y - 1), (x, y - 1), (x + 1, y - 1),
-                    (x - 1, y), (x, y), (x + 1, y),
-                    (x - 1, y + 1), (x, y + 1), (x + 1, y + 1)
-                   ]
+        offsets = [(x - 1, y - 1), (x, y - 1), (x + 1, y - 1),
+                   (x - 1, y), (x, y), (x + 1, y),
+                   (x - 1, y + 1), (x, y + 1), (x + 1, y + 1)]
         cell_less_wall = 0
-        for cordinate in offsets:
-            if is_valid(cordinate):
-                check_n = self.maze.get_cell(cordinate)
+        for coordinate in offsets:
+            if is_valid(coordinate):
+                check_n = self.maze.get_cell(coordinate)
                 if len(check_n.get_walls()) <= 2:
                     cell_less_wall += 1
         if cell_less_wall >= 8:
@@ -146,12 +144,10 @@ class MazeGenerator():
             current = self.maze.get_cell((x, y))
             if current.full:
                 continue
-            neighbours = [
-                (x, y - 1), (x + 1, y),
-                (x, y + 1), (x - 1, y)
-            ]
+            neighbours = [(x, y - 1), (x + 1, y),
+                          (x, y + 1), (x - 1, y)]
             neighbour_pos = self.rng.choice(neighbours)
-            if not self.check_cordinate_in_range(neighbour_pos):
+            if not self.check_coordinate_in_range(neighbour_pos):
                 continue
             neighbour = self.maze.get_cell(neighbour_pos)
             if neighbour.full:

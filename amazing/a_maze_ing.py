@@ -1,6 +1,4 @@
 import sys
-from os import path
-from os import remove as delete
 from .parser import get_config
 from .user_interface import input_loop
 
@@ -17,8 +15,6 @@ def main() -> None:
     except ValueError as e:
         print(f"Error occurred while accessing config file\n{e}")
         return
-    if path.exists(config["OUTPUT_FILE"]):
-        delete(config["OUTPUT_FILE"])
     input_loop(config)
 
 

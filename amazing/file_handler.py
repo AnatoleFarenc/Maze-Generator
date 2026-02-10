@@ -30,7 +30,7 @@ def show_maze_data(file: str) -> str:
         with open(file, "r") as fd:
             data = fd.read()
             print("\nRaw maze data:")
-            print(data)
+            print(f"\033[32m{data}\033[0m")
             print()
     except FileNotFoundError:
         return ("You haven't created a maze yet!\nFirst, select the "

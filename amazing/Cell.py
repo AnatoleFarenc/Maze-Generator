@@ -5,11 +5,7 @@ from typing import Tuple, Union, Optional
 class Cell():
     """ Represent one cell of maze """
     def __init__(self, x: int, y: int, width: int, height: int) -> None:
-        """ Initialize cordinate in maze and width, height of maze """
-        self.__x = 0
-        self.__y = 0
-        self.__height = 0
-        self.__width = 0
+        """ Initialize coordinate in maze and width, height of maze """
         self.__wall_bits = 0b1111
         self.__visited = False
         self.__full = False
@@ -125,15 +121,14 @@ class Cell():
 
     @property
     def g_h_cost(self) -> Union[int, float]:
-        """
-        Return the estimated cost:
+        """ Return the estimated cost:
 
-        f(n) = g(n) + h(n)
+            f(n) = g(n) + h(n)
 
-        g(n) -> Cost of distance from start passint through parents
+            g(n) -> Cost of distance from start passint through parents
 
-        h(n) -> Heuristic cost form cell cordinate to end cell without wall
-        """
+            h(n) -> Heuristic cost from cell coordinate to end cell
+            without wall """
         return self.__g_h_cost
 
     @g_h_cost.setter

@@ -76,6 +76,7 @@ import random
 from typing import (Union, Optional, TypeVar, Type,
                     Tuple, List, Iterator, Dict, Any)
 from math import inf
+import time
 
 T_GENERATE = TypeVar("T_GENERATE", bound="MazeGenerator")
 
@@ -383,6 +384,8 @@ class Maze():
         x, y = start
         if x >= 0 and x < self.width and y >= 0 and y < self.height:
             self.__start = start
+        else:
+            raise ValueError(f"Error: maze start out of range ({start})")
 
     @property
     def end(self) -> tuple[int, int]:
@@ -395,6 +398,8 @@ class Maze():
         if end[0] >= 0 and end[0] < self.width:
             if end[1] >= 0 and end[1] < self.height:
                 self.__end = end
+                return
+        raise ValueError(f"Error: maze end out of range ({end})")
 
     @property
     def height(self) -> int:
@@ -406,6 +411,8 @@ class Maze():
         """ Set height of maze """
         if height > 0:
             self.__height = height
+        else:
+            raise ValueError(f"Error: height to small: ({height})")
 
     @property
     def width(self) -> int:
@@ -417,9 +424,21 @@ class Maze():
         """ Set width of maze """
         if width > 0:
             self.__width = width
+        else:
+            raise ValueError(f"Error: witdth to small: ({width})")
+
+    @property
+    def seed(self) -> int:
+        return self.__seed
+
+    @seed.setter
+    def seed(self, seed: int) -> None:
+        if not isinstance(seed, int):
+            raise ValueError(f"Error: Invalid seed: ({seed})")
+        self.__seed = seed
 
     def __getitem__(self, index: int) -> list[Cell]:
-        """ Return line cell of maze grid """
+        """ Return cell of maze grid """
         if not (0 <= index < self.height):
             raise IndexError(f"Error: index {index} out of range "
                              f"({self.width}, {self.height})")
@@ -439,9 +458,9 @@ class Maze():
 
         return output_data
 
-    def get_cell(self, cordinate: Tuple[int, int]) -> Cell:
+    def get_cell(self, coordinate: Tuple[int, int]) -> Cell:
         """ Return Cell in grid maze """
-        x, y = cordinate
+        x, y = coordinate
         if x < 0 and x > self.width:
             raise ValueError(f"Error finding cell - x coordinate {x} is "
                              "outside of the maze dimensions")
@@ -449,7 +468,7 @@ class Maze():
             raise ValueError(f"Error finding cell - y coordinate {y} is "
                              "outside of the maze dimensions")
 
-        return self.grid[y][x]
+        return self[y][x]
 
     def add_connection(self, cell_1: tuple, cell_2: tuple) -> None:
         """ Adds a connection between two cells in the maze by removing the
@@ -472,7 +491,7 @@ class Maze():
             cell_value2.remove_wall("South")
         else:
             raise ValueError("Error adding connection: Invalid cell values:"
-                             f"cell_1={cell_1}, cell_2={cell_2}")
+                             f"cell_1 = {cell_1}, cell_2 = {cell_2}")
 
     def upscale_pattern(self) -> list:
         """ Upscale 42 pattern from the size of maze (1/3) """
@@ -482,8 +501,8 @@ class Maze():
         if self.height <= 15 or self.width <= 21:
             return self.__mid_pattern
 
-        width_pattern = self.width * (2/3)
-        height_pattern = self.height * (2/3)
+        width_pattern = self.width * (2 / 3)
+        height_pattern = self.height * (2 / 3)
         width_scale = max(1, int(width_pattern / len(self.__mid_pattern)))
         height_scale = max(1, int(height_pattern / len(self.__mid_pattern[0])))
         scale = min(height_scale, width_scale)
@@ -538,10 +557,10 @@ class MazeGenerator():
     def __init__(self, maze: Maze) -> None:
         """ Create default variable and set recursion limit """
         sys.setrecursionlimit(10_000)
-        self._maze: Maze | None = None
-        self.maze = maze
+        self.__maze: Maze = maze
         self.stack = []
-        self.seed = 0
+        self.seed = time.time_ns()
+        self.maze.seed = self.seed
 
     @property
     def maze(self) -> Maze:
@@ -553,7 +572,7 @@ class MazeGenerator():
 
     @maze.setter
     def maze(self, maze: Maze) -> None:
-        """ Set maze atribut with Maze """
+        """ Set maze attribute with Maze """
         self.__maze = maze
 
     @property
@@ -565,6 +584,8 @@ class MazeGenerator():
     def seed(self, seed: Union[int, None]) -> None:
         """ Set seed and create random generator """
         self.__seed = seed
+        if seed:
+            self.maze.seed = seed
         self.__rng = random.Random(self.seed)
 
     @property
@@ -582,9 +603,9 @@ class MazeGenerator():
         """ Return random value with generator """
         return self.__rng
 
-    def check_cordinate_in_range(self, cordinate: tuple[int, int]) -> bool:
+    def check_coordinate_in_range(self, coordinate: tuple[int, int]) -> bool:
         """ Return if the coordianate isn't out the range of maze grid """
-        x, y = cordinate
+        x, y = coordinate
         if x < 0 or x >= self.maze.width:
             return False
         if y < 0 or y >= self.maze.height:
@@ -610,7 +631,7 @@ class MazeGenerator():
                      "left": (current.x - 1, current.y)}
 
         for _, value in neighbour.items():
-            if self.check_cordinate_in_range(value):
+            if self.check_coordinate_in_range(value):
                 if not self.maze[value[1]][value[0]].visited:
                     neighbours.append(self.maze[value[1]][value[0]])
         if len(neighbours) > 0:
@@ -630,10 +651,10 @@ class MazeGenerator():
             self.create_paths(self.pop_stack())
 
     def can_break_wall(self, current: Cell, neighbor: Cell) -> bool:
-        """ Return if the wall betwenn current and neighbor can be break """
-        def is_valid(cordinate: tuple) -> bool:
-            c_x, c_y = cordinate
-            if not self.check_cordinate_in_range((c_x, c_y)):
+        """ Checks if the wall between current and neighbor can be broken """
+        def is_valid(coordinate: tuple) -> bool:
+            c_x, c_y = coordinate
+            if not self.check_coordinate_in_range((c_x, c_y)):
                 return False
             cell = self.maze.get_cell((c_x, c_y))
             return cell == current or cell == neighbor or not cell.full
@@ -643,9 +664,9 @@ class MazeGenerator():
                    (x - 1, y), (x, y), (x + 1, y),
                    (x - 1, y + 1), (x, y + 1), (x + 1, y + 1)]
         cell_less_wall = 0
-        for cordinate in offsets:
-            if is_valid(cordinate):
-                check_n = self.maze.get_cell(cordinate)
+        for coordinate in offsets:
+            if is_valid(coordinate):
+                check_n = self.maze.get_cell(coordinate)
                 if len(check_n.get_walls()) <= 2:
                     cell_less_wall += 1
         if cell_less_wall >= 8:
@@ -653,7 +674,7 @@ class MazeGenerator():
         return True
 
     def break_walls(self) -> None:
-        """ Break rand wall in maze to cread unperfect maze """
+        """ Break random walls to create imperfect maze """
         h = self.maze.height
         w = self.maze.width
         r = (h * w)
@@ -668,7 +689,7 @@ class MazeGenerator():
             neighbours = [(x, y - 1), (x + 1, y),
                           (x, y + 1), (x - 1, y)]
             neighbour_pos = self.rng.choice(neighbours)
-            if not self.check_cordinate_in_range(neighbour_pos):
+            if not self.check_coordinate_in_range(neighbour_pos):
                 continue
             neighbour = self.maze.get_cell(neighbour_pos)
             if neighbour.full:
@@ -678,10 +699,13 @@ class MazeGenerator():
 
     def generate(self) -> None:
         """ Generates a maze with the 42 pattern in the center """
-        self.maze.append_pattern()
-        x, y = self.maze.start
-        self.create_paths(self.maze[y][x])
-        return
+        try:
+            self.maze.append_pattern()
+            x, y = self.maze.start
+            self.create_paths(self.maze[y][x])
+        except RecursionError:
+            raise ValueError("The maze you tried to create is too large!\n"
+                             "Please reduce its size and try again")
 
     @classmethod
     def create_instance(cls: Type[T_GENERATE], config: dict) -> T_GENERATE:
@@ -694,12 +718,10 @@ class MazeGenerator():
         seed = config["SEED"]
 
         maze = Maze(width, height, start, end)
-
         generator = cls(maze)
 
-        if seed == 0:
-            seed = None
-        generator.seed = seed
+        if seed != 0:
+            generator.seed = seed
 
         generator.generate()
 

@@ -58,8 +58,6 @@ def input_loop(config: dict) -> None:
                         if maze.height < 7 or maze.width < 9:
                             system_message += ("\nHowever, its size does "
                                                "not allow for 42 pattern")
-                        system_message += ("\n\033[32mSeed: "
-                                           f"{maze.seed}\033[0m")
                         choice = None
                         options[2] = "Show path"
                         unexplored = None
@@ -109,7 +107,11 @@ def input_loop(config: dict) -> None:
                     choice = None
                     continue
                 case 5:
-                    system_message = show_maze_data(config["OUTPUT_FILE"])
+                    system_message = ""
+                    if maze is not None:
+                        print("\033[ASeed: "
+                              f"\033[32m{maze.seed}\033[0m\n")
+                    system_message += show_maze_data(config["OUTPUT_FILE"])
                 case 6:
                     print("\nConfig:")
                     system_message = ""
