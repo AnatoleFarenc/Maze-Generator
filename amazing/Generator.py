@@ -5,6 +5,7 @@ from .Cell import Cell
 from .Maze import Maze
 from .parser import is_valid_config
 from .file_handler import write_maze_to_file
+import time
 
 T_GENERATE = TypeVar("T_GENERATE", bound="MazeGenerator")
 
@@ -16,7 +17,8 @@ class MazeGenerator():
         sys.setrecursionlimit(10_000)
         self.__maze: Maze = maze
         self.stack = []
-        self.seed = 0
+        self.seed = time.time_ns()
+        self.maze.seed = self.seed
 
     @property
     def maze(self) -> Maze:
@@ -40,6 +42,8 @@ class MazeGenerator():
     def seed(self, seed: Union[int, None]) -> None:
         """ Set seed and create random generator """
         self.__seed = seed
+        if seed:
+            self.maze.seed = seed
         self.__rng = random.Random(self.seed)
 
     @property
@@ -178,9 +182,8 @@ class MazeGenerator():
         maze = Maze(width, height, start, end)
         generator = cls(maze)
 
-        if seed == 0:
-            seed = None
-        generator.seed = seed
+        if seed != 0:
+            generator.seed = seed
 
         generator.generate()
 

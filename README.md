@@ -277,7 +277,3 @@ sparingly for a few cases, in order to avoid spending too much time on the borin
   - Relevant UNICODE symbols
   - Useful libraries
   - Bash commands for Makefile
-
-
-# TODO
-Build target for makefile, with instructions in readme

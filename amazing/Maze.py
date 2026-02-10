@@ -66,6 +66,14 @@ class Maze():
         if width > 0:
             self.__width = width
 
+    @property
+    def seed(self) -> int:
+        return self.__seed
+
+    @seed.setter
+    def seed(self, seed: int) -> None:
+        self.__seed = seed
+
     def __getitem__(self, index: int) -> list[Cell]:
         """ Return line cell of maze grid """
         if not (0 <= index < self.height):

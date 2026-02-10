@@ -58,6 +58,8 @@ def input_loop(config: dict) -> None:
                         if maze.height < 7 or maze.width < 9:
                             system_message += ("\nHowever, its size does "
                                                "not allow for 42 pattern")
+                        system_message += ("\n\033[32mSeed: "
+                                           f"{maze.seed}\033[0m")
                         choice = None
                         options[2] = "Show path"
                         unexplored = None
