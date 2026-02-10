@@ -6,6 +6,7 @@ from .user_interface import input_loop
 
 
 def main() -> None:
+    """ main function """
     try:
         args = sys.argv
         if len(args) != 2:

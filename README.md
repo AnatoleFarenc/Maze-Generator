@@ -47,24 +47,32 @@ contains:
 
 ```
 A-Maze-ing
-|
+│
 ├── amazing                 # Source code
 │   ├── __init__.py
 │   └── ...
-├── data                    
+├── data
 │   ├── config.txt
 │   ├── maze.txt            # Created maze data will be stored here
 │   └── requirements.txt
-├── .flake8                 # Marks the venv folder to be excluded by flake8
+├── package                 # Source for re-usable module             
+│   ├── mazegen.py
+│   └── pyproject.toml
+├── .flake8
 ├── .gitignore
 ├── Makefile
-└── README.md
+├── mazegen*.whl            # Installable package
+└── README.md               # It's me!
 ```
 
-- The data/ folder holds the config and requirements files. The maze.txt file containing the created
-maze information will also be created here.
-- The amazing/ folder contains all of the source code.
-- Everything else is in the root folder.
+#### Notes
+- amazing: Folder containing all of the source code.
+- data: Folder that holds the config and requirements files. The maze.txt file containing the
+        created maze information will also be created here.
+- package: This folder contains the re-usable source code for the installable package, as well as a
+           .toml file to configure the build
+- .flake8: File containing two lines to exclude the venv/ folder from the flake8 formatting check.
+           Without this, flake8 sometimes enters the venv folder code while performing its tests.
 
 
 ## Maze Configuration
@@ -103,23 +111,58 @@ Possible values for each key:
                   will not result in a crash
 - ENTRY & EXIT: An x and y coordinate, separated by a comma. The coordinates must be within the
                 WIDTH and HEIGHT values
-- OUTPUT_FILE: A file name ending in '.txt'
+- OUTPUT_FILE: A file name ending in ".txt"
 - PERFECT: A boolean (True or False)
 - SEED: Any integer. If the seed is 0, the program will ignore it and generate a random maze
 - WALLS, OBJECTIVES & PATH: Any color as long as it's White, Red, Green, Blue, Yellow, or Purple
 
 
 ## Re-usability
-Blabla
+The installable package intended to be re-used should be located at the root of the repository
+under the name "mazegen-1.0.0-py3-none-any.whl", but can also be re-generated if needed. To do so,
+simply make sure you have already used the "**make install**" command, then run "**make build**".
+This will generate the package/dist folder containing the .whl file, as well as a tar.gz archive.
+
+Once you have obtained the .whl file, you can install it using
+"**pip install mazegen-1.0.0-py3-none-any.whl**" and import it in your project!
 
 
 ## Maze Generation Algorithm
-Blabla
+For the maze, we start from a two-dimensional grid of cells.
+For the generation, we chose to use the Depth-First Search (DFS) algorithm.
+
+We chose this algorithm because it is simple and efficient, and works well with the project
+requirements. The principle is to explore each cell by randomly choosing one of its neighboring
+cells that has not been visited yet. If all neighboring cells have already been visited, the
+algorithm goes back to the previous cell (backtracking) and repeats the process. This continues
+until all cells in the grid have been visited.
+
+This technique guarantees the generation of a perfect maze, meaning that there is only one unique
+path between any two cells.
+
+If we want to generate an imperfect maze, we randomly remove some walls while respecting certain
+rules, such as avoiding corridors wider than 2 cells.
+
+It was also required to integrate a **42** pattern at the center of the maze. To achieve this, we
+first retrieve the maze size and scale the pattern so that it occupies approximately one third of
+the maze. The cells representing the symbol are then marked as **full**, meaning they keep all
+their walls and are excluded from the maze generation process.
+
+
+## Pathfinding
+For pathfinding, several algorithms were possible, and we decided to use **A\*** (A-Star).
+
+One of the advantages of this algorithm compared to others such as **DFS** or **BFS** is that it is
+more efficient. While the previously mentioned algorithms may explore a large number of cells to
+find the shortest path, **A\*** uses a cost function combined with a heuristic to prioritize the
+exploration of the most promising neighboring cells.
+
+Starting from the initial position, the algorithm selects the neighbor with the lowest estimated
+total cost and repeats this process until the destination is reached.
 
 
 ## Bonus Features
-And now for the moment you've all been waiting for: the bonus features! These were very fun to
-implement and 
+And now, the moment you've all been waiting for: the bonus features!
 - An improved user-interface loop that allows for dynamic config changes and viewing maze data
   and configuration from within the program
 - Multiple display options for the generated maze
@@ -139,10 +182,11 @@ Behold, a good old table to demonstrate task distribution:
 
 |           anfarenc           |            chehir            |         Mutual Tasks         |
 |:-----------------------------|:-----------------------------|:-----------------------------|
-| Maze class implementation    | Parser for the config file   | Cell class implementation    |
-| Maze generation algorithm    | User interface loop          | Bug fixes                    |
-| Pathfinding algorithm        | Display functions            | Code refactoring             |
-| ...                          | ...                          | ...                          |
+| Cell class implementation    | Parser for the config file   | Bug fixes                    |
+| Maze class implementation    | User interface loop          | Code refactoring             |
+| Maze generation algorithm    | Display functions            | README additions             |
+| Pathfinding algorithm        | Bonus features               | Re-usable packaging          |
+|                              | Makefile                     |                              |
 
 
 ### Roadmap
@@ -174,9 +218,11 @@ Summarized timeline:
 5.  Proper maze generation algorithm
 6.  Center 42 symbol addition
 7.  Pathfinding algorithm
-8.  Lots of refactoring
+8.  Started README 
 9.  Makefile
-10. Finished README
+10. Lots of refactoring
+11. Re-usable module
+12. Finished README
 
 
 ### Progression
@@ -214,6 +260,14 @@ Below is a list of as many websites, articles, videos, or blogs we found during 
 
 [Markdown file structure example](https://stackoverflow.com/questions/19699059/print-directory-file-structure-with-icons-for-representation-in-markdown)
 
+[Maze Algorithm generation](https://en.wikipedia.org/wiki/Maze_generation_algorithm)
+
+[DFS Algorithm](https://youtu.be/HyK_Q5rrcr4?si=9pzVmxK7Vll3XEzA)
+
+[A* Algorithm Wikepedia](https://en.wikipedia.org/wiki/A*_search_algorithm)
+
+[A* Algorithm geeksforgeeks](https://www.geeksforgeeks.org/dsa/a-search-algorithm/)
+
 
 ## AI
 While we wanted to avoid using it as much as possible for pride-related reasons, AI was still used
@@ -223,3 +277,7 @@ sparingly for a few cases, in order to avoid spending too much time on the borin
   - Relevant UNICODE symbols
   - Useful libraries
   - Bash commands for Makefile
+
+
+# TODO
+Build target for makefile, with instructions in readme

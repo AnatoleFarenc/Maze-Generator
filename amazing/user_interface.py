@@ -1,3 +1,4 @@
+import random
 from copy import deepcopy
 from os import system as console
 from .minigame import game_loop
@@ -23,19 +24,21 @@ def input_loop(config: dict) -> None:
     unexplored = None
     style = "BLOCK"
     system_message = ''
+    color_list = ["WHITE", "RED", "GREEN", "BLUE", "YELLOW", "PURPLE"]
     options = {1: "Generate new maze",
-               2: "Toggle maze format",
-               3: "Show path",
-               4: "Show maze data",
-               5: "Show config",
-               6: "Modify config",
-               7: "Play minigame :)",
+               2: "Show path",
+               3: "Toggle maze format",
+               4: "Randomize colors",
+               5: "Show maze data",
+               6: "Show config",
+               7: "Modify config",
+               8: "Play minigame :)",
                0: "Exit"}
     while True:
         console("clear")
         print("=== A-Maze-ing ===")
+        print(f"\nMaze ({style} format):")
         if maze is None:
-            print(f"\nMaze ({style} format):")
             print("The generated maze will appear here!")
         else:
             assert maze_style is not None
@@ -50,18 +53,39 @@ def input_loop(config: dict) -> None:
                 case 1:
                     try:
                         maze = create_new_maze(config)
-                        maze_style = format_maze(maze, None, style)
+                        maze_style = format_maze(maze, style)
                         system_message = "Maze created successfully!"
+                        if maze.height < 7 or maze.width < 9:
+                            system_message += ("\nHowever, its size does "
+                                               "not allow for 42 pattern")
                         choice = None
-                        options[3] = "Show path"
+                        options[2] = "Show path"
                         unexplored = None
                         continue
-                    except RecursionError:
+                    except ValueError as e:
                         choice = None
-                        system_message = ("The maze you tried to create is "
-                                          "too large!\nPlease reduce its size "
-                                          "and try again")
+                        system_message = str(e)
                 case 2:
+                    if maze is None:
+                        system_message = ("You haven't created a maze yet!\n"
+                                          "First, select the 'Generate new"
+                                          " maze' option, then come back :)")
+                    else:
+                        assert maze is not None
+                        if options[2] == "Show path":
+                            if unexplored is None:
+                                unexplored = deepcopy(maze_style)
+                                maze_style = display_path(maze, style, colors)
+                            else:
+                                unexplored, maze_style = maze_style, unexplored
+                            options[2] = "Hide path"
+                        else:
+                            options[2] = "Show path"
+                            unexplored, maze_style = maze_style, unexplored
+                        system_message = ""
+                        choice = None
+                        continue
+                case 3:
                     if style == "ASCII":
                         style = "UNICODE"
                     elif style == "UNICODE":
@@ -69,44 +93,31 @@ def input_loop(config: dict) -> None:
                     else:
                         style = "ASCII"
                     if maze is not None:
-                        maze_style = format_maze(maze, None, style)
+                        maze_style = format_maze(maze, style)
                     choice = None
-                    options[3] = "Show path"
+                    options[2] = "Show path"
                     unexplored = None
                     system_message = ""
                     continue
-                case 3:
-                    if maze is None:
-                        system_message = ("You haven't created a maze yet!\n"
-                                          "First, select the 'Generate new"
-                                          " maze' option, then come back :)")
-                    else:
-                        assert maze is not None
-                        if options[3] == "Show path":
-                            if unexplored is None:
-                                unexplored = deepcopy(maze_style)
-                                maze_style = display_path(maze, style, colors)
-                            else:
-                                unexplored, maze_style = maze_style, unexplored
-                            options[3] = "Hide path"
-                        else:
-                            options[3] = "Show path"
-                            unexplored, maze_style = maze_style, unexplored
-                        system_message = ""
-                        choice = None
-                        continue
                 case 4:
-                    system_message = show_maze_data(config["OUTPUT_FILE"])
+                    config["WALLS"] = random.choice(color_list)
+                    config["OBJECTIVES"] = random.choice(color_list)
+                    config["PATH"] = random.choice(color_list)
+                    system_message = "Colors randomized!"
+                    choice = None
+                    continue
                 case 5:
+                    system_message = show_maze_data(config["OUTPUT_FILE"])
+                case 6:
                     print("\nConfig:")
                     system_message = ""
                     display_config(config)
-                case 6:
+                case 7:
                     config_menu(config)
                     choice = None
                     system_message = "Config saved!"
                     continue
-                case 7:
+                case 8:
                     game_loop(config, style)
                     choice = None
                     system_message = ""

@@ -2,12 +2,12 @@
 
 
 # Maze size variables
-WIDTH=25
-HEIGHT=25
+WIDTH=5
+HEIGHT=5
 
 # Start and End coordinates
 ENTRY=0,0
-EXIT=24,24
+EXIT=4,4
 
 # Output file name
 OUTPUT_FILE=data/maze.txt

@@ -12,7 +12,13 @@ VENV = venv
 PYTHON = $(VENV)/bin/python3
 PIP = $(VENV)/bin/pip
 
-TRASH = $(SRC)/__pycache__ $(VENV) .mypy_cache $(OUTPUT)
+PACKAGE = package/
+MODULE = mazegen
+
+DIST = $(PACKAGE)/dist
+WHEEL = *.whl
+
+TRASH = $(SRC)/__pycache__ $(VENV) .mypy_cache __pycache__ $(PACKAGE)/dist $(PACKAGE)/*.egg-info $(OUTPUT)
 
 
 # ANSI codes
@@ -46,6 +52,13 @@ install:
 run: $(CONFIG)
 	@$(PYTHON) -m $(EXE) $(CONFIG)
 
+build:
+	@echo "$(BOLD)Building installable package...$(RESET)"
+	@$(PYTHON) -m build $(PACKAGE) > /dev/null 2>&1
+	@rm -f ./$(WHEEL)
+	@cp $(DIST)/$(WHEEL) ./
+	@echo "$(GREEN)Package built successfully!$(RESET)"
+
 lint:
 	@echo "$(BOLD)Verifying project source code:$(RESET)"
 
@@ -63,7 +76,7 @@ debug:
 	@$(PYTHON) -m pdb -m $(EXE) $(CONFIG)
 
 clean:
-	@echo "$(YELLOW)Commencing cleanup operation...$(RESET)"
+	@echo "$(YELLOW)Initiating cleanup operation...$(RESET)"
 	@found=0; \
 	for i in $(TRASH); do \
 		if [ -d "$$i" ]; then \

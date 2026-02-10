@@ -69,7 +69,8 @@ def is_valid_config(config: Dict) -> None:
             raise ValueError(f"Error parsing config file - '{config[key]}' is "
                              f"not a valid input for {key} (must be int)")
     # Checks that the maze means the minimum size requirements
-    if config["WIDTH"] * config["HEIGHT"] < 4:
+    if (config["WIDTH"] * config["HEIGHT"] < 4 or config["WIDTH"] < 2 or
+            config["HEIGHT"] < 2):
         raise ValueError("Error parsing config file - Maze of size "
                          f"{config['WIDTH']}x{config['HEIGHT']} is too small "
                          "(2x2 minimum)")

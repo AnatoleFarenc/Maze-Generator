@@ -1,6 +1,6 @@
 import sys
 import random
-from typing import Union, Optional, TypeVar, Type
+from typing import Union, TypeVar, Type
 from .Cell import Cell
 from .Maze import Maze
 from .parser import is_valid_config
@@ -10,14 +10,17 @@ T_GENERATE = TypeVar("T_GENERATE", bound="MazeGenerator")
 
 
 class MazeGenerator():
-    def __init__(self) -> None:
+    """ Create path in grid of maze to create a real maze """
+    def __init__(self, maze: Maze) -> None:
+        """ Create default variable and set recursion limit """
         sys.setrecursionlimit(10_000)
-        self.__maze: Optional[Maze] = None
+        self.__maze: Maze = maze
         self.stack = []
         self.seed = 0
 
     @property
     def maze(self) -> Maze:
+        """ Return Maze """
         if self.__maze is None:
             raise ValueError("Error creating maze - Maze has not been "
                              "initialized")
@@ -25,30 +28,37 @@ class MazeGenerator():
 
     @maze.setter
     def maze(self, maze: Maze) -> None:
+        """ Set maze attribute with Maze """
         self.__maze = maze
 
     @property
     def seed(self) -> Union[int, None]:
+        """ Retrun seed to random generation """
         return self.__seed
 
     @seed.setter
     def seed(self, seed: Union[int, None]) -> None:
+        """ Set seed and create random generator """
         self.__seed = seed
         self.__rng = random.Random(self.seed)
 
     @property
     def stack(self) -> list[Cell]:
+        """ Return stack """
         return self.__stack
 
     @stack.setter
     def stack(self, stack: list[Cell]) -> None:
+        """ Create stack """
         self.__stack = stack
 
     @property
     def rng(self) -> random.Random:
+        """ Return random value with generator """
         return self.__rng
 
     def check_cordinate_in_range(self, cordinate: tuple[int, int]) -> bool:
+        """ Return if the coordianate isn't out the range of maze grid """
         x, y = cordinate
         if x < 0 or x >= self.maze.width:
             return False
@@ -57,13 +67,16 @@ class MazeGenerator():
         return True
 
     def pop_stack(self) -> Cell:
+        """ Return and remove first Cell on stack """
         cell: Cell = self.__stack.pop()
         return cell
 
     def push_stack(self, cell: Cell) -> None:
+        """ Add Cell in end of stack """
         self.__stack.append(cell)
 
     def check_neighbours(self, current: Cell) -> Cell | None:
+        """ Return a random valid neighbour cell """
         neighbours = []
 
         neighbour = {"top": (current.x, current.y - 1),
@@ -80,6 +93,7 @@ class MazeGenerator():
         return None
 
     def create_paths(self, current: Cell) -> None:
+        """ Create path in grid to generate maze """
         current.visited = True
         next = self.check_neighbours(current)
         if next:
@@ -91,6 +105,7 @@ class MazeGenerator():
             self.create_paths(self.pop_stack())
 
     def can_break_wall(self, current: Cell, neighbor: Cell) -> bool:
+        """ Checks if the wall between current and neighbor can be broken """
         def is_valid(cordinate: tuple) -> bool:
             c_x, c_y = cordinate
             if not self.check_cordinate_in_range((c_x, c_y)):
@@ -110,11 +125,12 @@ class MazeGenerator():
                 check_n = self.maze.get_cell(cordinate)
                 if len(check_n.get_walls()) <= 2:
                     cell_less_wall += 1
-        if cell_less_wall >= 9:
+        if cell_less_wall >= 8:
             return False
         return True
 
     def break_walls(self) -> None:
+        """ Break random walls to create imperfect maze """
         h = self.maze.height
         w = self.maze.width
         r = (h * w)
@@ -140,24 +156,18 @@ class MazeGenerator():
                 self.maze.add_connection(current.coordinates, neighbour_pos)
 
     def generate(self) -> None:
-        """ Generates a maze with the 42 pattern in the center. If the exit
-            overlaps with the pattern, moves the exit down one cell and
-            repeats """
+        """ Generates a maze with the 42 pattern in the center """
         try:
             self.maze.append_pattern()
             x, y = self.maze.start
             self.create_paths(self.maze[y][x])
-            return
-        except ValueError:
-            x = self.maze.end[0]
-            y = self.maze.end[1] + 1
-            self.maze.end = (x, y)
-            self.generate()
+        except RecursionError:
+            raise ValueError("The maze you tried to create is too large!\n"
+                             "Please reduce its size and try again")
 
     @classmethod
     def create_instance(cls: Type[T_GENERATE], config: dict) -> T_GENERATE:
-        generator = cls()
-
+        """ Return MazeGenerator Object """
         height = config["HEIGHT"]
         width = config["WIDTH"]
         start = config["ENTRY"]
@@ -165,7 +175,8 @@ class MazeGenerator():
         perfect = config["PERFECT"]
         seed = config["SEED"]
 
-        generator.maze = Maze(width, height, start, end)
+        maze = Maze(width, height, start, end)
+        generator = cls(maze)
 
         if seed == 0:
             seed = None
@@ -187,7 +198,11 @@ def create_new_maze(config: dict) -> Maze:
     except ValueError as e:
         raise ValueError("Error creating maze - received invalid config:"
                          f"\n{e}")
-    maze_gen = MazeGenerator.create_instance(config)
-    write_maze_to_file(config, maze_gen.maze)
+    try:
+        maze_gen = MazeGenerator.create_instance(config)
+        write_maze_to_file(config, maze_gen.maze)
+    except ValueError as e:
+        raise ValueError("Error creating maze - invalid generation:"
+                         f"\n{e}")
 
     return maze_gen.maze

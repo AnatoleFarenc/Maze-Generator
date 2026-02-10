@@ -4,7 +4,9 @@ from .Cell import Cell
 
 
 class Pathfinder():
+    """ Represent the more short path between two cell in maze """
     def __init__(self, maze: Maze):
+        """ Init minimun setting of pathinder """
         self.__maze: Maze = maze
         self.__open: List[Cell] = []
         self.__close: List[Cell] = []
@@ -13,37 +15,46 @@ class Pathfinder():
 
     @property
     def maze(self) -> Maze:
+        """ Return maze """
         return self.__maze
 
     @maze.setter
     def maze(self, maze: Maze) -> None:
+        """ Set maze """
         self.__maze = maze
 
     @property
     def open(self) -> List[Any]:
+        """ Return open stack """
         return self.__open
 
     @property
     def close(self) -> List[Any]:
+        """ Return close stack """
         return self.__close
 
     @property
     def start(self) -> Cell:
+        """ Return start cell """
         return self.__start
 
     @start.setter
     def start(self, n_start: Cell) -> None:
+        """ Set start cell """
         self.__start = n_start
 
     @property
     def end(self) -> Cell:
+        """ Return end cell """
         return self.__end
 
     @end.setter
     def end(self, n_end: Cell) -> None:
+        """ Set end cell """
         self.__end = n_end
 
     def get_neighbors(self, current: Cell) -> List[Cell]:
+        """ Return list of neighbor without wall with current cell """
         neighborhood = []
         walls = current.get_walls()
 
@@ -58,6 +69,7 @@ class Pathfinder():
         return neighborhood
 
     def get_heuristic_path(self, current: Cell) -> int:
+        """ Return heurisitic path with by using Manhattan distance """
         x, y = current.coordinates
         x_end, y_end = self.maze.end
 
@@ -65,6 +77,7 @@ class Pathfinder():
         return (int(abs(x - x_end) + abs(y - y_end)))
 
     def find_exit(self, start: Cell) -> List[Any]:
+        """ Return Cell list of path to start at end """
         # Check if I've reached the end
         self.open.append(self.start)
         self.start.cost = 0
@@ -109,6 +122,7 @@ class Pathfinder():
         return []
 
     def get_directions(self) -> List[str]:
+        """ Return direction list for describ the path """
         x, y = self.maze.start
         path_cell_list = self.find_exit(self.maze[y][x])
 
@@ -128,6 +142,7 @@ class Pathfinder():
         return directions
 
     def get_direction_string(self) -> str:
+        """ Return string of direction list"""
         direction_string = ""
         for dir in self.get_directions():
             direction_string += dir
