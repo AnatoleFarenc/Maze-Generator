@@ -1,4 +1,4 @@
-*This project has been created as part of the 42 curriculum by anfarenc, chehir*
+*Created by Anatole Farenc and Caelan Hehir*
 
 # Description
 A-Maze-ing is all about, you guessed it, maze generation. In this project, we learn how to create
@@ -41,7 +41,7 @@ Project can now be run safely!
 ```
 
 If an error occurs, it is likely because you ran out of space on your machine, or because your
-computer does not have the correct version of python installed (42 students know).
+student computer does not have the correct version of python installed.
 
 ### Make Lint
 Now that the venv is set up, you can run "make lint" to verify the source code. More specifically,
@@ -222,7 +222,7 @@ path between any two cells.
 If we want to generate an imperfect maze, we randomly remove some walls while respecting certain
 rules, such as avoiding corridors wider than 2 cells.
 
-It was also required to integrate a **42** pattern at the center of the maze. To achieve this, we
+We also integrate a symbol pattern at the center of the maze. To achieve this, we
 first retrieve the maze size and scale the pattern so that it occupies approximately one third of
 the maze. The cells representing the symbol are then marked as **full**, meaning they keep all
 their walls and are excluded from the maze generation process.
@@ -283,7 +283,7 @@ Some actual examples of this include:
   to update all the parsing code.
 - When we decided to have multiple maze formats for the terminal display, which meant adding a
   'style' parameter to the already established display functions.
-- Adding the 42 symbol generation ***after*** having already implemented the maze creation algorithm.
+- Adding the center symbol generation ***after*** having already implemented the maze creation algorithm.
 - Playing Smash Ultimate instead of working because we didn't know what to do next.
 
 Luckily, because we wrote the code to be easily maintainable and re-usable, this was not too big a
@@ -296,7 +296,7 @@ Summarized timeline:
 3.  Output file creation
 4.  User interface
 5.  Proper maze generation algorithm
-6.  Center 42 symbol addition
+6.  Center symbol addition
 7.  Pathfinding algorithm
 8.  Started README 
 9.  Makefile
